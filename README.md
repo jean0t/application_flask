@@ -17,3 +17,6 @@ after that and with the dependencies installed run the run.py file with this com
 ```
 python3 run.py
 ```
+
+## Reference to this project
++ Flask de A a Z: Crie aplicações web mais completas e robustas em Python
