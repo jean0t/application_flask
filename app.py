@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, request
+from flask import Flask, redirect, request, render_template
 
 from config import app_config, app_active
 
 config = app_config[app_active]
 
 from flask_sqlalchemy import SQLAlchemy
+
+from controller.User import UserController
 
 def create_app(config_name):
     app = Flask(__name__, template_folder="templates")
@@ -27,23 +29,34 @@ def create_app(config_name):
     def login():
         return "Tela de login"
     
+    @app.route("/login/", methods=["POST"])
+    def login_post():
+        user = UserController()
+
+        email = request.form["email"]
+        password = request.form["password"]
+
+        result = user.login(email, password)
+
+        if result:
+            return redirect("/admin")
+        else:
+            return render_template("login.html", data={"status": 401, "msg": "Dados de usuário incorretos", "type": None})
+
+
     @app.route("/recovery-password/")
     def recovery_password():
         return "Tela de recuperar senha"
     
-    @app.route("/profile", methods=["POST"])
-    def create_profile():
-        username = request.form["username"]
-        password = request.form["password"]
+    @app.route("/recovery-password/", methods=["POST"])
+    def send_recovery_password():
+        user = UserController()
 
-        return "Perfil criado"
-    
-    @app.route("/profile/<int:id>", methods=["PUT"])
-    def edit_total_profile(id):
-        username = request.form["username"]
-        password = request.form["password"]
+        result = user.recovery(request.form["email"])
 
-        return f"Editado usuário cujo ID é {id}"
-    
+        if result:
+            return render_template("recovery.html", data={"status": 200, "msg": "Email de recuperação enviado com sucesso"})
+        else:
+            return render_template("recovery.html", data={"status": 401, "msg": "Erro ao enviar email de recuperação"})
 
     return app
