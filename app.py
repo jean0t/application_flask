@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 from flask import Flask, redirect, request, render_template
-
 from config import app_config, app_active
+from flask_sqlalchemy import SQLAlchemy
+from controller.User import UserController
+from admin.Admin import start_views
 
 config = app_config[app_active]
 
-from flask_sqlalchemy import SQLAlchemy
-
-from controller.User import UserController
 
 def create_app(config_name):
     app = Flask(__name__, template_folder="templates")
@@ -19,6 +18,8 @@ def create_app(config_name):
     app.config["SQLALCHEMY_DATABASE_URI"] = config.SQLALCHEMY_DATABASE_URI
     app.config["SQLALCHEMY_TRACK_MODIFICATION"] = False
     db = SQLAlchemy(config.APP)
+    start_views(app,db)
+    
     db.init_app(app)
 
     @app.route("/")
