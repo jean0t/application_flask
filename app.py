@@ -17,19 +17,22 @@ def create_app(config_name):
 
     app.config["SQLALCHEMY_DATABASE_URI"] = config.SQLALCHEMY_DATABASE_URI
     app.config["SQLALCHEMY_TRACK_MODIFICATION"] = False
+
+    app.config["FLASK_ADMIN_SWATCH"] = "readable"
+
     db = SQLAlchemy(config.APP)
-    start_views(app,db)
-    
+    start_views(app, db)
+
     db.init_app(app)
 
     @app.route("/")
     def index():
         return "Hello World!"
-    
+
     @app.route("/login/")
     def login():
         return "Tela de login"
-    
+
     @app.route("/login/", methods=["POST"])
     def login_post():
         user = UserController()
@@ -42,13 +45,19 @@ def create_app(config_name):
         if result:
             return redirect("/admin")
         else:
-            return render_template("login.html", data={"status": 401, "msg": "Dados de usuário incorretos", "type": None})
-
+            return render_template(
+                "login.html",
+                data={
+                    "status": 401,
+                    "msg": "Dados de usuário incorretos",
+                    "type": None,
+                },
+            )
 
     @app.route("/recovery-password/")
     def recovery_password():
         return "Tela de recuperar senha"
-    
+
     @app.route("/recovery-password/", methods=["POST"])
     def send_recovery_password():
         user = UserController()
@@ -56,8 +65,14 @@ def create_app(config_name):
         result = user.recovery(request.form["email"])
 
         if result:
-            return render_template("recovery.html", data={"status": 200, "msg": "Email de recuperação enviado com sucesso"})
+            return render_template(
+                "recovery.html",
+                data={"status": 200, "msg": "Email de recuperação enviado com sucesso"},
+            )
         else:
-            return render_template("recovery.html", data={"status": 401, "msg": "Erro ao enviar email de recuperação"})
+            return render_template(
+                "recovery.html",
+                data={"status": 401, "msg": "Erro ao enviar email de recuperação"},
+            )
 
     return app

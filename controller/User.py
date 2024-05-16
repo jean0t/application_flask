@@ -1,9 +1,10 @@
 from model.User import User
 
+
 class UserController:
     def __init__(self):
         self.user_model = User()
-    
+
     def login(self, email, password):
         self.user_model.email = email
 
@@ -20,4 +21,3 @@ class UserController:
 
     def recovery(email):
         return ""
-
