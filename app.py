@@ -3,7 +3,9 @@ from flask import Flask, redirect, request, render_template
 from config import app_config, app_active
 from flask_sqlalchemy import SQLAlchemy
 from controller.User import UserController
+from controller.Product import ProductController
 from admin.Admin import start_views
+from flask_bootstrap import Bootstrap
 
 config = app_config[app_active]
 
@@ -22,6 +24,7 @@ def create_app(config_name):
 
     db = SQLAlchemy(config.APP)
     start_views(app, db)
+    Bootstrap(app)
 
     db.init_app(app)
 
@@ -31,7 +34,7 @@ def create_app(config_name):
 
     @app.route("/login/")
     def login():
-        return "Tela de login"
+        return render_template("login.html")
 
     @app.route("/login/", methods=["POST"])
     def login_post():
@@ -74,5 +77,31 @@ def create_app(config_name):
                 "recovery.html",
                 data={"status": 401, "msg": "Erro ao enviar email de recuperação"},
             )
+
+    @app.route("/product", methods=["POST"])
+    def save_products():
+        product = ProductController()
+
+        result = product.save_product(request.form)
+
+        if result:
+            message = "Inserido"
+        else:
+            message = "Não inserido"
+
+        return message
+
+    @app.route("/product", methods=["PUT"])
+    def update_products():
+        product = ProductController()
+
+        result = product.update_product(request.form)
+
+        if result:
+            message = "Editado"
+        else:
+            message = "Não editado"
+
+        return message
 
     return app

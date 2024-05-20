@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from sqlalchemy import func
 from sqlalchemy.orm import relationship
 from flask_sqlalchemy import SQLAlchemy
 from config import app_config, app_active
@@ -29,3 +29,53 @@ class Product(db.Model):
     category = db.Column(db.Integer, db.ForeignKey(Category.id), nullable=False)
     usuario = relationship(User)
     categoria = relationship(Category)
+
+    def save(self):
+        try:
+            db.session.add(self)
+            db.session.commit()
+            return True
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            return False
+
+    def update(self, obj):
+        try:
+            res = db.session.query(Product).filter(Product.id == self.id).update(obj)
+            db.session.commit()
+            return True
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            return False
+
+    def get_all(self):
+        try:
+            res = db.session.query(Product).all()
+        except Exception as e:
+            res = []
+            print(e)
+        finally:
+            db.session.close()
+            return res
+
+    def get_total_products(self):
+        try:
+            res = db.session.query(func.count(Product.id)).first()
+        except Exception as e:
+            res = []
+            print(e)
+        finally:
+            db.session.close()
+            return res
+
+    def get_last_products(self):
+        try:
+            res = db.session.query(Product).order_by(Product.date_created).limit(5).all()
+        except Excpetion as e:
+            res = []
+            print(e)
+        finally:
+            db.session.close()
+            return res
