@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from flask_login import LoginManager, login_user, logout_user
 from flask import Flask, redirect, request, render_template, Response, json, abort
 from config import app_config, app_active
 from flask_sqlalchemy import SQLAlchemy
@@ -14,6 +15,9 @@ config = app_config[app_active]
 
 def create_app(config_name):
     app = Flask(__name__, template_folder="templates")
+
+    login_manager = LoginManager()
+    login_manager.init_app(app)
 
     app.secret_key = config.SECRET
     app.config.from_object(app_config[config_name])
@@ -59,7 +63,7 @@ def create_app(config_name):
 
     @app.route("/login/")
     def login():
-        return render_template("login.html")
+        return render_template("login.html", data={"status": 200, "msg": None, "type": None})
 
     @app.route("/login/", methods=["POST"])
     def login_post():
@@ -71,14 +75,18 @@ def create_app(config_name):
         result = user.login(email, password)
 
         if result:
-            return redirect("/admin")
+            if result.role == 4:
+                return render_template("login.html", data={"status": 401}, "msg": "Your user do not have permission to access the admin", "type": 2)
+            else:
+                login_user(result)
+                return redirect("/admin")
         else:
             return render_template(
                 "login.html",
                 data={
                     "status": 401,
                     "msg": "Dados de usuário incorretos",
-                    "type": None,
+                    "type": 1,
                 },
             )
 
