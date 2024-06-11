@@ -9,7 +9,7 @@ class Config(object):
     TEMPLATE_FOLDER = Path(__file__).absolute() / "templates"
     ROOT_DIR = Path(__file__).parent.absolute()
     APP = None
-    SQLACLCHEMY_DATABASE_URI = "mysql+mysqldb://user:passwd@host:port/database"
+    SQLACLCHEMY_DATABASE_URI = "mariadb+mysqldb://user:password@host:port/database"
 
 
 class DevelopmentConfig(Config):
